@@ -1,0 +1,168 @@
+[
+    {
+      "name": "HIPAA",
+      "details": {
+        "country": "USA",
+        "region": "North America",
+        "regulator": "HHS (U.S. Department of Health & Human Services)",
+        "requirement": "PHI (Protected Health Information) Encryption at Rest & Transit",
+        "solution": "AES-256 encryption, Access Logs, Secure Key Management"
+      },
+      "description": "Ensures PHI is encrypted, access-controlled, and protected under privacy and security rules."
+    },
+    {
+      "name": "GDPR",
+      "details": {
+        "country": "European Union",
+        "region": "Europe",
+        "regulator": "EDPB (European Data Protection Board)",
+        "requirement": "Article 32 Data Protection for healthcare data",
+        "solution": "Encryption, Access Control, Data Subject Rights, Right to Erasure"
+      },
+      "description": "Mandates secure processing of personal healthcare data, including encryption and user rights."
+    },
+    {
+      "name": "ISO 27001",
+      "details": {
+        "country": "Global",
+        "region": "Worldwide",
+        "regulator": "ISO (International Organization for Standardization)",
+        "requirement": "Annex A.10 Cryptographic Controls",
+        "solution": "Data encryption policies, risk assessments, cryptographic key management"
+      },
+      "description": "A global standard for information security management systems, including encryption requirements."
+    },
+    {
+      "name": "HITRUST",
+      "details": {
+        "country": "USA",
+        "region": "North America",
+        "regulator": "HITRUST Alliance",
+        "requirement": "Cryptographic Protection for Healthcare Data",
+        "solution": "FIPS 140-2 certified encryption, Secure Key Management"
+      },
+      "description": "Ensures organizations meet strict security and compliance controls for healthcare data."
+    },
+    {
+      "name": "PCI DSS",
+      "details": {
+        "country": "Global",
+        "region": "Worldwide",
+        "regulator": "PCI Security Standards Council",
+        "requirement": "Requirement 3.4 - PAN Data Protection",
+        "solution": "Tokenization, AES-256 encryption, Masking"
+      },
+      "description": "Protects payment data in healthcare transactions, requiring encryption of cardholder data."
+    },
+    {
+      "name": "DPA 2018 (UK GDPR)",
+      "details": {
+        "country": "United Kingdom",
+        "region": "Europe",
+        "regulator": "ICO (Information Commissioner's Office)",
+        "requirement": "Protection of Personal Health Information (PHI)",
+        "solution": "Encryption, Secure Storage, Access Logs"
+      },
+      "description": "The UK's version of GDPR, ensuring encryption and privacy of patient health data."
+    },
+    {
+      "name": "PIPEDA",
+      "details": {
+        "country": "Canada",
+        "region": "North America",
+        "regulator": "Office of the Privacy Commissioner of Canada",
+        "requirement": "Health Data Privacy & Protection",
+        "solution": "Encryption, Consent-Based Data Processing, Access Controls"
+      },
+      "description": "Ensures that personal healthcare data is collected, used, and stored securely in Canada."
+    },
+    {
+      "name": "NDHB",
+      "details": {
+        "country": "India",
+        "region": "Asia",
+        "regulator": "National Digital Health Blueprint (NDHB) by NHA",
+        "requirement": "Health Data Security & Privacy",
+        "solution": "Encryption of health records, Unique Health IDs, Secure Data Sharing"
+      },
+      "description": "Provides a framework for secure digital health data management in India."
+    },
+    {
+      "name": "DPDP Act",
+      "details": {
+        "country": "India",
+        "region": "Asia",
+        "regulator": "Ministry of Electronics and Information Technology (MeitY)",
+        "requirement": "Digital Personal Data Protection",
+        "solution": "Strong Encryption, Data Localization, Data Subject Rights"
+      },
+      "description": "India's data protection law, which includes healthcare data security requirements."
+    },
+    {
+      "name": "APPI",
+      "details": {
+        "country": "Japan",
+        "region": "Asia",
+        "regulator": "PPC (Personal Information Protection Commission)",
+        "requirement": "Protection of Medical Personal Information",
+        "solution": "Data Anonymization, Encryption, Access Logs"
+      },
+      "description": "Ensures secure handling and processing of healthcare-related personal information in Japan."
+    },
+    {
+      "name": "PDPA",
+      "details": {
+        "country": "Singapore",
+        "region": "Asia",
+        "regulator": "PDPC (Personal Data Protection Commission)",
+        "requirement": "Health Data Security & Privacy",
+        "solution": "Encryption, Access Controls, Consent Management"
+      },
+      "description": "Regulates the collection, use, and protection of healthcare personal data in Singapore."
+    },
+    {
+      "name": "My Health Record Act",
+      "details": {
+        "country": "Australia",
+        "region": "Oceania",
+        "regulator": "Australian Digital Health Agency",
+        "requirement": "Protection of Digital Health Records",
+        "solution": "Strong Authentication, Encryption, Data Breach Notifications"
+      },
+      "description": "Requires secure storage, encryption, and access control for Australia's national health records."
+    },
+    {
+      "name": "HITECH Act",
+      "details": {
+        "country": "USA",
+        "region": "North America",
+        "regulator": "HHS (U.S. Department of Health & Human Services)",
+        "requirement": "Electronic Health Records (EHR) Security",
+        "solution": "End-to-End Encryption, Audit Logs, Two-Factor Authentication"
+      },
+      "description": "Expands HIPAA's requirements for the secure handling of Electronic Health Records."
+    },
+    {
+      "name": "LGPD",
+      "details": {
+        "country": "Brazil",
+        "region": "South America",
+        "regulator": "ANPD (National Data Protection Authority)",
+        "requirement": "Healthcare Data Protection",
+        "solution": "Encryption, Data Localization, Access Management"
+      },
+      "description": "Brazil's data protection law, requiring healthcare data security and user consent."
+    },
+    {
+      "name": "CCPA",
+      "details": {
+        "country": "USA",
+        "region": "North America",
+        "regulator": "California Attorney General",
+        "requirement": "Patient Data Privacy & Security",
+        "solution": "Encryption, Data Access Logs, User Rights to Deletion"
+      },
+      "description": "California's data privacy law, extending HIPAA-like protections to patient data."
+    }
+  ]
+  
