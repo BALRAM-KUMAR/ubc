@@ -1,6 +1,5 @@
 from sqlalchemy import Column, event, Integer, String, Boolean, DateTime, ForeignKey, Text, JSON, text
 from sqlalchemy.orm import relationship, validates
-from core.models.tenant_key import TenantAwareForeignKey
 from sqlalchemy.sql import func
 from core.database import TenantAwareBase, tenant_schema
 from core.models.public import Tenant
@@ -17,17 +16,16 @@ class Role(TenantAwareBase):
     is_custom = Column(Boolean, default=False)
     users = relationship("User", back_populates="role")
 
-    __table_args__ = {'schema': None}  # This will use the dynamic schema
 
 
 class User(TenantAwareBase):
     __tablename__ = "users"
-    __table_args__ = {'schema': None}
     id = Column(Integer, primary_key=True)
+    username = Column(String(30))
     email = Column(String(100), unique=True)
     password_hash = Column(String(200))
     role_id = Column(Integer, ForeignKey('roles.id'))  # Now points to tenant-local roles
-    tenant_id = Column(Integer, nullable=False, index=True)  # No FK
+    tenant_id = Column(Integer ,nullable=False, index=True)  # No FK
     
     # Security Features
     mfa_enabled = Column(Boolean, default=False)
@@ -40,7 +38,7 @@ class User(TenantAwareBase):
     last_login = Column(DateTime)
     created_at = Column(DateTime, server_default=func.now())
 
-    # Relationships
+    patients = relationship("Patient", back_populates="user")
     role = relationship("Role", back_populates="users")
     providers = relationship("Provider", back_populates="user")
 
@@ -51,7 +49,6 @@ class User(TenantAwareBase):
 # --------------------------
 class Clinic(TenantAwareBase):
     __tablename__ = "clinics"
-    __table_args__ = {'schema': None}
     id = Column(Integer, primary_key=True)
     name = Column(String(100), unique=True)
     description = Column(Text)
@@ -64,7 +61,6 @@ class Clinic(TenantAwareBase):
 
 class Location(TenantAwareBase):
     __tablename__ = "locations"
-    __table_args__ = {'schema': None}   
     id = Column(Integer, primary_key=True)
     clinic_id = Column(Integer, ForeignKey("clinics.id"), nullable=False)
     name = Column(String(100))
@@ -81,7 +77,6 @@ class Location(TenantAwareBase):
 
 class Department(TenantAwareBase):
     __tablename__ = "departments"
-    __table_args__ = {'schema': None}    
     id = Column(Integer, primary_key=True)
     clinic_id = Column(Integer, ForeignKey("clinics.id"))
     location_id = Column(Integer, ForeignKey("locations.id"))
@@ -100,7 +95,6 @@ class Department(TenantAwareBase):
 # --------------------------
 class Provider(TenantAwareBase):
     __tablename__ = "providers"
-    __table_args__ = {'schema': None}   
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("users.id"))
     department_id = Column(Integer, ForeignKey("departments.id"))
@@ -131,10 +125,10 @@ class Provider(TenantAwareBase):
 # --------------------------
 class Patient(TenantAwareBase):
     __tablename__ = "patients"
-    __table_args__ = {'schema': None}    
     id = Column(Integer, primary_key=True)
     first_name = Column(String(50))
     last_name = Column(String(50))
+    phone_number = Column(String(20))
     date_of_birth = Column(DateTime)
     gender = Column(String(20))
     encrypted_ssn = Column(String(200))
@@ -142,15 +136,24 @@ class Patient(TenantAwareBase):
     policy_number = Column(String(100))
     primary_care_id = Column(Integer, ForeignKey("providers.id"))  # Added
     
+
+    user_id = Column(Integer, ForeignKey("users.id"))  # <-- Add this line
+    clinic_id = Column(Integer, ForeignKey("clinics.id"))
+    location_id = Column(Integer, ForeignKey("locations.id"))
+    department_id = Column(Integer, ForeignKey("departments.id"))
+    primary_care_id = Column(Integer, ForeignKey("providers.id"))
+
+    user = relationship("User", back_populates="patients")  # <-- Add this line
+    clinic = relationship("Clinic", backref="patients")
+    location = relationship("Location", backref="patients")
+    department = relationship("Department", backref="patients")
     appointments = relationship("Appointment", back_populates="patient")
     medical_history = relationship("MedicalHistory", back_populates="patient")
     insurance_claims = relationship("InsuranceClaim", back_populates="patient")
     invoices = relationship("Invoice", back_populates="patient")
 
-
 class MedicalHistory(TenantAwareBase):
     __tablename__ = "medical_history"
-    __table_args__ = {'schema': None}    
     id = Column(Integer, primary_key=True)
     patient_id = Column(Integer, ForeignKey("patients.id"))
     provider_id = Column(Integer, ForeignKey("providers.id"))
@@ -169,7 +172,6 @@ class MedicalHistory(TenantAwareBase):
 # --------------------------
 class Appointment(TenantAwareBase):
     __tablename__ = "appointments"
-    __table_args__ = {'schema': None}
     id = Column(Integer, primary_key=True)
     patient_id = Column(Integer, ForeignKey("patients.id"))
     provider_id = Column(Integer, ForeignKey("providers.id"))
@@ -197,7 +199,6 @@ class Appointment(TenantAwareBase):
 
 class AppointmentReminder(TenantAwareBase):
     __tablename__ = "appointment_reminders"
-    __table_args__ = {'schema': None}
     id = Column(Integer, primary_key=True)
     appointment_id = Column(Integer, ForeignKey("appointments.id"))
     reminder_type = Column(String(20))  # "sms", "email"
@@ -210,7 +211,6 @@ class AppointmentReminder(TenantAwareBase):
 #waitlist functionality
 class Waitlist(TenantAwareBase):
     __tablename__ = "waitlist"
-    __table_args__ = {'schema': None}
     id = Column(Integer, primary_key=True)
     patient_id = Column(Integer, ForeignKey("patients.id"))
     provider_id = Column(Integer, ForeignKey("providers.id"))
@@ -227,7 +227,6 @@ class Waitlist(TenantAwareBase):
 #Multiple Services (Specialized Appointments)
 class Service(TenantAwareBase):
     __tablename__ = "services"
-    __table_args__ = {'schema': None}    
     id = Column(Integer, primary_key=True)
     name = Column(String(100))
     description = Column(Text)
@@ -259,7 +258,6 @@ class Service(TenantAwareBase):
 # --------------------------
 class Invoice(TenantAwareBase):
     __tablename__ = "invoices"
-    __table_args__ = {'schema': None}    
     id = Column(Integer, primary_key=True)
     patient_id = Column(Integer, ForeignKey("patients.id"))
     appointment_id = Column(Integer, ForeignKey("appointments.id"))
@@ -274,7 +272,6 @@ class Invoice(TenantAwareBase):
 
 class InsuranceClaim(TenantAwareBase):
     __tablename__ = "insurance_claims"
-    __table_args__ = {'schema': None}    
     id = Column(Integer, primary_key=True)
     patient_id = Column(Integer, ForeignKey("patients.id"))
     invoice_id = Column(Integer, ForeignKey("invoices.id"))
@@ -289,7 +286,6 @@ class InsuranceClaim(TenantAwareBase):
 # --------------------------
 class MedicalCode(TenantAwareBase):
     __tablename__ = "medical_codes"
-    __table_args__ = {'schema': None}    
     id = Column(Integer, primary_key=True)
     code_type = Column(String(20))  # ICD10, CPT, LOINC
     code = Column(String(20))
@@ -309,7 +305,6 @@ class MedicalCode(TenantAwareBase):
 
 class Prescription(TenantAwareBase):
     __tablename__ = "prescriptions"
-    __table_args__ = {'schema': None}    
     id = Column(Integer, primary_key=True)
     patient_id = Column(Integer, ForeignKey("patients.id"))
     medication = Column(JSON)  # Structured drug information
@@ -326,7 +321,6 @@ class Prescription(TenantAwareBase):
 # --------------------------
 class TelemedicineSession(TenantAwareBase):
     __tablename__ = "telemedicine_sessions"
-    __table_args__ = {'schema': None}
     id = Column(Integer, primary_key=True)
     appointment_id = Column(Integer, ForeignKey("appointments.id"))
     start_time = Column(DateTime)
@@ -339,7 +333,6 @@ class TelemedicineSession(TenantAwareBase):
 # --------------------------
 class InventoryItem(TenantAwareBase):
     __tablename__ = "inventory_items"
-    __table_args__ = {'schema': None}
     id = Column(Integer, primary_key=True)
     name = Column(String(100))  # e.g., "Bandages"
     description = Column(Text)

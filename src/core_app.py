@@ -1,5 +1,5 @@
 # core_app.py
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from fastapi.middleware import Middleware
@@ -9,7 +9,8 @@ from core.database import engine, PublicBase
 from sqlalchemy import text
 from core.models import *
 from core.utils.setup import load_compliance_data, load_plans_data
-
+from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
@@ -36,6 +37,13 @@ def create_app() -> FastAPI:
         lifespan=lifespan,
         middleware=[Middleware(TenantMiddleware)]  # Pass class-based middleware here
     )
+
+    @app.exception_handler(RequestValidationError)
+    async def validation_exception_handler(request: Request, exc: RequestValidationError):
+        return JSONResponse(
+            status_code=422,
+            content={"detail": exc.errors(), "body": exc.body},
+        )
 
     # Security headers
     app.add_middleware(

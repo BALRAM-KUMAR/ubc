@@ -8,17 +8,24 @@ from typing import AsyncGenerator
 from .database import AsyncSessionLocal, tenant_schema
 from .config import settings
 from .models.tenant import User, Role
+import logging
 
+# Set up logging
+logging.basicConfig()
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_PREFIX}/auth/login")
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
-    async with AsyncSessionLocal() as session:
+    # Create new session with current context
+    session = AsyncSessionLocal()
+    try:
+        # Explicitly set schema for this session
         current_schema = tenant_schema.get()
         await session.execute(text(f"SET search_path TO {current_schema}"))
-        try:
-            yield session
-        finally:
-            await session.close()
+        yield session
+    finally:
+        await session.close()
 
 async def get_current_user(
     request: Request,

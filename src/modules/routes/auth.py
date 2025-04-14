@@ -17,7 +17,7 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 async def signup(
     request: Request,
     user_data: UserCreate, 
-    db: AsyncSession = Depends(get_db)  # Session is managed by get_db()
+    db: AsyncSession = Depends(get_db) 
 ):
     tenant = getattr(request.state, "tenant", None)
 

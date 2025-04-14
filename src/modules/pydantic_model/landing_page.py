@@ -10,7 +10,7 @@ class PlanSchema(BaseModel):
     recommended: bool = False
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class LanguageSchema(BaseModel):
     id: int
@@ -19,7 +19,7 @@ class LanguageSchema(BaseModel):
     description: Optional[str] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class ComplianceImplementedSchema(BaseModel):
     id: int
@@ -28,7 +28,7 @@ class ComplianceImplementedSchema(BaseModel):
     description: Optional[str] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class TenantTestimonialsSchema(BaseModel):
     id: int
@@ -39,7 +39,7 @@ class TenantTestimonialsSchema(BaseModel):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class FAQAnswerSchema(BaseModel):
     id: int
@@ -48,7 +48,7 @@ class FAQAnswerSchema(BaseModel):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class FAQQuestionSchema(BaseModel):
     id: int
@@ -57,7 +57,7 @@ class FAQQuestionSchema(BaseModel):
     answers: List[FAQAnswerSchema] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class FAQCommentSchema(BaseModel):
     id: int
@@ -67,7 +67,7 @@ class FAQCommentSchema(BaseModel):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class FAQLikeSchema(BaseModel):
     id: int
@@ -76,4 +76,4 @@ class FAQLikeSchema(BaseModel):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True

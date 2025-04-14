@@ -3,13 +3,18 @@ from starlette.requests import Request
 from starlette.responses import Response
 from fastapi import HTTPException
 from contextvars import ContextVar
-from sqlalchemy import select
+from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 from .database import AsyncSessionLocal, tenant_schema
 from .models.public import Tenant
 from .config import settings
 import re
+import logging
 
+# Set up logging
+logging.basicConfig()
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 tenant_context = ContextVar("tenant_context", default=None)
 
 class TenantMiddleware(BaseHTTPMiddleware):
@@ -40,7 +45,13 @@ class TenantMiddleware(BaseHTTPMiddleware):
 
                 request.state.tenant = tenant
                 tenant_schema.set(f"tenant_{tenant.id}")
+                print(f"Middleware set tenant_schema to: {tenant_schema.get()}")  # Debugging print
+
                 tenant_context.set(tenant.id)
+
+        # async with AsyncSessionLocal() as test_session:
+        #     result = await test_session.execute(text("SHOW search_path"))
+        #     logger.debug(f"IMMEDIATE TEST search_path: {(await result.fetchone())[0]}")
 
         response = await call_next(request)
         return response
