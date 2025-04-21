@@ -1,4 +1,4 @@
-from sqlalchemy import Column, event, Integer, String, Boolean, DateTime, ForeignKey, Text, JSON, text
+from sqlalchemy import Column, Index, event, Integer, String, Boolean, DateTime, ForeignKey, Text, JSON, text
 from sqlalchemy.orm import relationship, validates
 from sqlalchemy.sql import func
 from core.database import TenantAwareBase, tenant_schema
@@ -105,6 +105,8 @@ class Provider(TenantAwareBase):
     phone_number = Column(String(20))
     dob = Column(DateTime)
     gender = Column(String(20))
+    fee = Column(Integer)
+    currency = Column(String(30))
     # Professional Details
     license_number = Column(String(100))  # Encrypted
     specialty = Column(String(100))
@@ -128,29 +130,49 @@ class Patient(TenantAwareBase):
     id = Column(Integer, primary_key=True)
     first_name = Column(String(50))
     last_name = Column(String(50))
+    patient_type = Column(String(50))  # 'self' or 'other'
+    relationship_to_user = Column(String(50), nullable=True)  # New field
+
     phone_number = Column(String(20))
     date_of_birth = Column(DateTime)
     gender = Column(String(20))
     encrypted_ssn = Column(String(200))
     insurance_provider = Column(String(100))
     policy_number = Column(String(100))
-    primary_care_id = Column(Integer, ForeignKey("providers.id"))  # Added
     
-
-    user_id = Column(Integer, ForeignKey("users.id"))  # <-- Add this line
-    clinic_id = Column(Integer, ForeignKey("clinics.id"))
-    location_id = Column(Integer, ForeignKey("locations.id"))
-    department_id = Column(Integer, ForeignKey("departments.id"))
+    user_id = Column(Integer, ForeignKey("users.id"))
     primary_care_id = Column(Integer, ForeignKey("providers.id"))
 
-    user = relationship("User", back_populates="patients")  # <-- Add this line
-    clinic = relationship("Clinic", backref="patients")
-    location = relationship("Location", backref="patients")
-    department = relationship("Department", backref="patients")
+    user = relationship("User", back_populates="patients")  
     appointments = relationship("Appointment", back_populates="patient")
     medical_history = relationship("MedicalHistory", back_populates="patient")
     insurance_claims = relationship("InsuranceClaim", back_populates="patient")
     invoices = relationship("Invoice", back_populates="patient")
+
+    __table_args__ = (
+        Index(
+            'uq_user_self_patient',
+            'user_id',
+            'patient_type',
+            unique=True,
+            postgresql_where=text("patient_type = 'self'")
+        ),
+    )
+
+    @validates('patient_type')
+    def validate_patient_type(self, key, patient_type):
+        allowed = ['self', 'other']
+        if patient_type not in allowed:
+            raise ValueError(f"Invalid patient type. Allowed: {allowed}")
+        if patient_type == 'self':
+            existing = self.query.filter_by(
+                user_id=self.user_id,
+                patient_type='self'
+            ).first()
+            if existing and existing.id != self.id:
+                raise ValueError("User can only have one 'self' patient")
+        return patient_type
+    
 
 class MedicalHistory(TenantAwareBase):
     __tablename__ = "medical_history"
@@ -159,7 +181,7 @@ class MedicalHistory(TenantAwareBase):
     provider_id = Column(Integer, ForeignKey("providers.id"))
     diagnosis = Column(Text)
     treatment = Column(Text)
-    prescriptions = Column(JSON)  # Structured medication data
+    prescriptions = Column(JSON) 
     visit_date = Column(DateTime)
     
     patient = relationship("Patient", back_populates="medical_history")
@@ -190,7 +212,7 @@ class Appointment(TenantAwareBase):
 
     # Relationships
     patient = relationship("Patient", back_populates="appointments")
-    provider = relationship("Provider")
+    provider = relationship("Provider", back_populates="appointments")
     location = relationship("Location")
     department = relationship("Department")
     service = relationship("Service", back_populates="appointments")

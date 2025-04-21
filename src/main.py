@@ -11,6 +11,7 @@ from modules.routes import (auth,
                               location, 
                               user_created_by_admin, 
                               department, clinic, role, user_details)
+from core.ai import department_matcher
 app = create_app()
 
 # Routes
@@ -25,7 +26,7 @@ app.include_router(department.router)
 app.include_router(user_created_by_admin.router)
 app.include_router(role.router)
 app.include_router(user_details.router)
-
+app.include_router(department_matcher.router)
 
 @app.get("/health")
 async def health_check():
